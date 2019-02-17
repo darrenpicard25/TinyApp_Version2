@@ -9,7 +9,10 @@
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
+    <%- include ./partials/_header.ejs %>
+<br>
     <!-- Add EJS code here -->
-  <p>  <%= `Short URL: ${shortURL}     LongURL: ${longURL} ` %></p>
+<strong><%= ` ${shortURL}` %></strong> <%=`------->  ${longURL} ` %>
+
 </body>
 </html>

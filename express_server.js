@@ -17,6 +17,13 @@ app.get('/urls', (req, res) => {
   let templateData = { 'urls' : urlDatabase };
   res.render('urls_index', templateData);
 });
+app.post('/urls', (req, res) => {
+  let newURL = req.body.longURL;
+});
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
 
 app.get('/urls/:shortURL', (req, res) => {
   let templateData = {
