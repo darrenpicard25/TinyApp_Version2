@@ -1,10 +1,12 @@
 //Require Modules and set up server
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const app = express();
 const bodyParser = require('body-parser');
 const PORT = 8080;
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 function generateRandomString() {
   const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
@@ -32,7 +34,7 @@ app.post('/urls', (req, res) => {
   let newURL = req.body.longURL;
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = newURL;
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls`);
 });
 app.post('/urls/:shortURL/delete', (req, res) => {
   let deletingURL = req.params.shortURL;
