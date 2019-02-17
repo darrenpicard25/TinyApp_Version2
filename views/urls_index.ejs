@@ -13,11 +13,18 @@
     <!-- Add EJS code here -->
     <br>
     <h3>My URLS:</h3>
-    <ol>
+    <table>
+
     <% for (let url in urls) { %>
-  <li><strong><%=` ${url}` %></strong><%= "------->" %><a href= <%='/u/'+url %> ><%= `${urls[url]}` %></a></li>
+  <tr>
+ <td><strong><%=` ${url}` %></strong><%= "------->" %><a href= <%='/u/'+url %> ><%= `${urls[url]}` %></a></td>
+  <td> &nbsp&nbsp&nbsp&nbsp </td>
+   <td><form method="POST" class="inline-form" action=<%=`/urls/${url}/delete`%>>
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form></td>
+  </tr>
 
     <%}%>
-  </ol>
+</table>
 </body>
 </html>
