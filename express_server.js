@@ -13,6 +13,19 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+app.get('/urls', (req, res) => {
+  let templateData = { 'urls' : urlDatabase };
+  res.render('urls_index', templateData);
+});
+
+app.get('/urls/:shortURL', (req, res) => {
+  let templateData = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL]
+  };
+  res.render('urls_show', templateData);
+});
+
 
 //Set Server to listen to port 8080
 app.listen( PORT, () => {
