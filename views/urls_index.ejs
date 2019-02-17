@@ -15,7 +15,8 @@
     <h3>My URLS:</h3>
     <ol>
     <% for (let url in urls) { %>
-  <li><strong><%= ` ${url}` %></strong> <%=`------->  ${urls[url]} ` %></li>
+  <li><strong><%=` ${url}` %></strong><%= "------->" %><a href= <%='/u/'+url %> ><%= `${urls[url]}` %></a></li>
+
     <%}%>
   </ol>
 </body>
