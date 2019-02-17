@@ -19,6 +19,8 @@
   <tr>
  <td><strong><%=` ${url}` %></strong><%= "------->" %><a href= <%='/u/'+url %> ><%= `${urls[url]}` %></a></td>
   <td> &nbsp&nbsp&nbsp&nbsp </td>
+  <td><form method="GET" class="inline-form" action=<%=`/urls/${url}`%>>
+      <button type="submit" class="btn btn-info">Edit</button></form></td>
    <td><form method="POST" class="inline-form" action=<%=`/urls/${url}/delete`%>>
       <button type="submit" class="btn btn-danger">Delete</button>
     </form></td>
