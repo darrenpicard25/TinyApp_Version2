@@ -1,8 +1,21 @@
 //Require Modules and set up server
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 const PORT = 8080;
 app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true}));
+
+function generateRandomString() {
+  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+  let randID = '';
+  for (let i = 1; i <= 6; i++) {
+    randID += characters[Math.floor(Math.random()*characters.length)];
+  }
+  return randID;
+}
+
+
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
