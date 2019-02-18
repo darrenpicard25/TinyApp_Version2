@@ -88,16 +88,16 @@ app.post('/register', (req, res) => {
   let newEmail = req.body.email;
   let newPassword = req.body.password;
   let newId = generateRandomString();
-  if (!newEmail && !newPassword && emailChecker(newEmail)) {
-    res.sendStatus(400);
-  } else {
-    usersDatabase[newId] = {
+  if (newEmail && newPassword && !emailChecker(newEmail)) {
+        usersDatabase[newId] = {
       id: newId,
       email: newEmail,
       password: newPassword
     };
     res.cookie('user_id', newId);
     res.redirect('/urls');
+  } else {
+    res.sendStatus(400);
   }
 });
 
