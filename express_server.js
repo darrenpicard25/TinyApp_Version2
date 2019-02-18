@@ -3,6 +3,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const app = express();
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 const PORT = 8080;
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -36,13 +37,9 @@ function urlsForUser (id) {
   return userURLs;
 }
 
-const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: '3fR2w1'},
-  "9sm5xK": { longURL: "http://www.google.com", userID: '3fR2w1' }
-};
+const urlDatabase = {};
 
-const usersDatabase = {
-  "3fR2w1": { id: "3fR2w1", email: "darrenpicard25@gmail.com", password: "hello" } };
+const usersDatabase = {};
 
 
 app.get('/urls.json', (req, res) => {
@@ -81,7 +78,8 @@ app.post('/login', (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   let id = emailChecker(email);
-  if (id && usersDatabase[id].password === password) {
+
+  if (id && bcrypt.compareSync(password ,usersDatabase[id].password)) {
     res.cookie('user_id', id);
     res.redirect('/urls');
   } else {
@@ -116,15 +114,16 @@ app.post('/register', (req, res) => {
   let newPassword = req.body.password;
   let newId = generateRandomString();
   if (newEmail && newPassword && !emailChecker(newEmail)) {
-        usersDatabase[newId] = {
-      id: newId,
-      email: newEmail,
-      password: newPassword
-    };
-    res.cookie('user_id', newId);
-    res.redirect('/urls');
+    let hashedPassword = bcrypt.hashSync(newPassword, 10);
+    usersDatabase[newId] = {
+    id: newId,
+    email: newEmail,
+    password: hashedPassword
+  };
+  res.cookie('user_id', newId);
+  res.redirect('/urls');
   } else {
-    res.sendStatus(400);
+  res.sendStatus(400);
   }
 });
 
