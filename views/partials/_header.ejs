@@ -10,16 +10,16 @@
 </head>
 <body style="font-size:20px; padding:50px;">
     <!-- Add EJS code here -->
-    <h1>TinyApp</h1>
-    <a href="/urls">URLS</a> | <a href="/urls/new/">Create New URL</a>
-    <br>
+    <h1><strong>TinyApp</strong></h1>
     <% if (username) { %>
+    <a href="/urls">URLS</a> | <a href="/urls/new/">Create New URL</a>
       <form method="POST" action='/logout'>
         <%= `Logged in as ${username.email}` %>
         <button class="btn btn-primary" type="submit">Signout</button>
       </form>
     <% } else { %>
-     <a href="/login">Log IN</a> | <a href="/register">Register</a>
+     <a href="/login">Log In</a> | <a href="/register">Register</a>
+     <br>
     </form>
     <% } %>
 </body>
