@@ -13,11 +13,11 @@
     <!-- Add EJS code here -->
     <br>
     <h3><strong>My URLS:</strong></h3>
+    <% if (username) { %>
     <table>
-
     <% for (let url in urls) { %>
   <tr>
- <td><strong><%=` ${url}` %></strong><%= "------->" %><a href= <%='/u/'+url %> ><%= `${urls[url]}` %></a></td>
+ <td><strong><%=` ${url}` %></strong><%= "------->" %><a href= <%='/u/'+url %> ><%= `${urls[url].longURL}` %></a></td>
   <td> &nbsp&nbsp&nbsp&nbsp </td>
   <td><form method="GET" class="inline-form" action=<%=`/urls/${url}`%>>
       <button type="submit" class="btn btn-info">Edit</button></form></td>
@@ -25,8 +25,10 @@
       <button type="submit" class="btn btn-danger">Delete</button>
     </form></td>
   </tr>
-
     <%}%>
+    <% } else { %>
+    <p>Please log in or Register</p>
+    <% } %>
 </table>
 </body>
 </html>

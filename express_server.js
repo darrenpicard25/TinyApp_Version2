@@ -26,13 +26,24 @@ function emailChecker(email) {
   return '';
 }
 
+function urlsForUser (id) {
+  let userURLs = {};
+  for (let url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      userURLs[url] = urlDatabase[url];
+    }
+  }
+  return userURLs;
+}
+
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: '3fR2w1'},
+  "9sm5xK": { longURL: "http://www.google.com", userID: '3fR2w1' }
 };
 
 const usersDatabase = {
   "3fR2w1": { id: "3fR2w1", email: "darrenpicard25@gmail.com", password: "hello" } };
+
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
@@ -40,21 +51,30 @@ app.get('/urls.json', (req, res) => {
 
 app.get('/urls', (req, res) => {
   let templateData = {
-    'urls' : urlDatabase,
+    'urls' : urlsForUser(req.cookies.user_id),
     username: usersDatabase[req.cookies.user_id]
      };
   res.render('urls_index', templateData);
 });
 app.post('/urls', (req, res) => {
   let newURL = req.body.longURL;
+  let userID = req.cookies.user_id;
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = newURL;
+  urlDatabase[shortURL] = {longURL: newURL, userID: userID};
   res.redirect(`/urls`);
+
+
 });
 app.post('/urls/:shortURL/delete', (req, res) => {
-  let deletingURL = req.params.shortURL;
-  delete urlDatabase[deletingURL];
-  res.redirect('/urls');
+  let currentUser = req.cookies.user_id;
+  let urlCreator = urlDatabase[req.params.shortURL].userID;
+  if (currentUser === urlCreator) {
+    let deletingURL = req.params.shortURL;
+    delete urlDatabase[deletingURL];
+    res.redirect('/urls');
+  } else {
+      res.send('This page does not belong to you. So you cannot delete it\n');
+  }
 });
 
 app.post('/login', (req, res) => {
@@ -69,11 +89,18 @@ app.post('/login', (req, res) => {
   }
 });
 
+//b2xVn2
 app.post('/urls/:shortURL', (req, res) => {
-  let newURL = req.body.newlongURL;
-  let shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = newURL;
-  res.redirect('/urls');
+  let currentUser = req.cookies.user_id;
+  let urlCreator = urlDatabase[req.params.shortURL].userID;
+  if (currentUser === urlCreator) {
+    let newURL = req.body.newlongURL;
+    let shortURL = req.params.shortURL;
+    urlDatabase[shortURL].longURL = newURL;
+    res.redirect('/urls');
+  } else {
+      res.send('This page does not belong to you. So you cannot edit it\n');
+  }
 });
 
 app.get('/register' , (req, res) => {
@@ -110,7 +137,7 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  let link = urlDatabase[req.params.shortURL];
+  let link = urlDatabase[req.params.shortURL].longURL;
   res.redirect(link);
 });
 
@@ -129,12 +156,18 @@ app.post('/logout', (req, res) => {
 
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateData = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
-    username: usersDatabase[req.cookies.user_id]
-  };
-  res.render('urls_show', templateData);
+  let currentUser = req.cookies.user_id;
+  let urlCreator = urlDatabase[req.params.shortURL].userID;
+  if (currentUser === urlCreator) {
+    let templateData = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      username: usersDatabase[req.cookies.user_id]
+    };
+    res.render('urls_show', templateData);
+  } else {
+    res.send('This page does not belong to you\n');
+  }
 });
 
 
