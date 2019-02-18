@@ -17,10 +17,22 @@ function generateRandomString() {
   return randID;
 }
 
-var urlDatabase = {
+function emailChecker(email) {
+  for (let user in usersDatabase) {
+    if (usersDatabase[user].email === email) {
+      return usersDatabase[user].id;
+    }
+  }
+  return '';
+}
+
+const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const usersDatabase = {
+  "3fR2w1": { id: "3fR2w1", email: "darrenpicard25@gmail.com", password: "hello" } };
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
@@ -29,7 +41,7 @@ app.get('/urls.json', (req, res) => {
 app.get('/urls', (req, res) => {
   let templateData = {
     'urls' : urlDatabase,
-    username: req.cookies.username
+    username: usersDatabase[req.cookies.user_id]
      };
   res.render('urls_index', templateData);
 });
@@ -46,9 +58,15 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  let username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');
+  let email = req.body.email;
+  let password = req.body.password;
+  let id = emailChecker(email);
+  if (id && usersDatabase[id].password === password) {
+    res.cookie('user_id', id);
+    res.redirect('/urls');
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.post('/urls/:shortURL', (req, res) => {
@@ -56,6 +74,39 @@ app.post('/urls/:shortURL', (req, res) => {
   let shortURL = req.params.shortURL;
   urlDatabase[shortURL] = newURL;
   res.redirect('/urls');
+});
+
+app.get('/register' , (req, res) => {
+  let templateData = {
+    'urls' : urlDatabase,
+    username: usersDatabase[req.cookies.user_id]
+   };
+  res.render('urls_register', templateData);
+});
+
+app.post('/register', (req, res) => {
+  let newEmail = req.body.email;
+  let newPassword = req.body.password;
+  let newId = generateRandomString();
+  if (!newEmail && !newPassword && emailChecker(newEmail)) {
+    res.sendStatus(400);
+  } else {
+    usersDatabase[newId] = {
+      id: newId,
+      email: newEmail,
+      password: newPassword
+    };
+    res.cookie('user_id', newId);
+    res.redirect('/urls');
+  }
+});
+
+app.get('/login', (req, res) => {
+  let templateData = {
+    'urls' : urlDatabase,
+    username: usersDatabase[req.cookies.user_id]
+    };
+  res.render('urls_login', templateData);
 });
 
 app.get('/u/:shortURL', (req, res) => {
@@ -66,13 +117,13 @@ app.get('/u/:shortURL', (req, res) => {
 app.get("/urls/new", (req, res) => {
   let templateData = {
   'urls' : urlDatabase,
-  username: req.cookies.username
+  username: usersDatabase[req.cookies.user_id]
    };
   res.render("urls_new", templateData);
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
@@ -81,7 +132,7 @@ app.get('/urls/:shortURL', (req, res) => {
   let templateData = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies.username
+    username: usersDatabase[req.cookies.user_id]
   };
   res.render('urls_show', templateData);
 });
