@@ -12,11 +12,11 @@
     <%- include ./partials/_header.ejs %>
 <br>
     <!-- Add EJS code here -->
-<strong><%= ` ${shortURL}` %></strong> <%=" ------->" %> <a href= <%='/u/'+shortURL %> ><%= ` ${longURL} ` %></a>
+<h4><strong><%= ` ${shortURL}` %></strong></h4>
 
   <form class="form-inline" action=<%=`/urls/${shortURL}`%> method="POST">
   <label for="longURL">URL:</label>
-  <input class="form-control" type="text" name="newlongURL" placeholder="http://" style="width: 300px; margin: 1em">
+  <input class="form-control" type="text" name="newlongURL" value=<%=longURL%> placeholder="http://" style="width: 300px; margin: 1em">
   <button type="submit" class="btn btn-primary">Change URL</button>
   </form>
 </body>
