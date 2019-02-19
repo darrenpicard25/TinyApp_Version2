@@ -13,7 +13,7 @@
     <h1><strong>TinyApp</strong></h1>
     <% if (username) { %>
     <a href="/urls">URLS</a> | <a href="/urls/new/">Create New URL</a>
-      <form method="POST" action='/logout'>
+      <form method="POST" action='/logout?_method=PUT'>
         <%= `Logged in as ${username.email}` %>
         <button class="btn btn-primary" type="submit">Signout</button>
       </form>

@@ -3,6 +3,7 @@
 Require All Modules to be used
 ----------------------------------------------------------
 */
+const methodOverride = require('method-override');
 const express = require('express');
 const cookieSession = require('cookie-session');
 const app = express();
@@ -23,12 +24,15 @@ app.use(cookieSession({
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
+app.use(methodOverride('_method'));
 
 /*
 
 All functions used in server
 ----------------------------------------------------------------------------------
 */
+
+//Function generates a random 6 character string and returns it
 function generateRandomString() {
   const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
   let randID = '';
@@ -37,6 +41,9 @@ function generateRandomString() {
   }
   return randID;
 }
+
+//Function checks to see if an email exists in the user database.
+//Returns the string if found or an empty string if not found
 function emailChecker(email) {
   for (let user in usersDatabase) {
     if (usersDatabase[user].email === email) {
@@ -45,6 +52,8 @@ function emailChecker(email) {
   }
   return '';
 }
+
+//Takes in a user ID and returns an object with same structure us urlsDatabase but it only contains the urls linked to that id
 function urlsForUser (id) {
   const userURLs = {};
   for (let url in urlDatabase) {
@@ -59,9 +68,8 @@ function urlsForUser (id) {
 Both URL and User Databases
 
 */
-const urlDatabase = {};
-
-const usersDatabase = {};
+const urlDatabase = {};   //Data base containing all the URLs. Short Long and ID of who created them
+const usersDatabase = {};   //Database of each user registered
 
 /*
 
@@ -85,6 +93,14 @@ app.get('/urls.json', (req, res) => {
 All Main GET Requests
 -----------------------------------------------------
 */
+app.get('/', (req, res) => {
+  if(req.session.user_id) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
+});
+
 app.get('/urls', (req, res) => {
   const templateData = {
     'urls' : urlsForUser(req.session.user_id),
@@ -148,7 +164,12 @@ app.post('/urls', (req, res) => {
   urlDatabase[shortURL] = {longURL: newURL, userID: userID};
   res.redirect(`/urls`);
 });
-app.post('/login', (req, res) => {
+/*
+
+All PUT Requests
+---------------------------------------------------------------------
+*/
+app.put('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const id = emailChecker(email);
@@ -161,7 +182,7 @@ app.post('/login', (req, res) => {
   }
 });
 
-app.post('/register', (req, res) => {
+app.put('/register', (req, res) => {
   const newEmail = req.body.email;
   const newPassword = req.body.password;
   const newId = generateRandomString();
@@ -180,24 +201,13 @@ app.post('/register', (req, res) => {
   }
 });
 
-app.post('/logout', (req, res) => {
+app.put('/logout', (req, res) => {
   req.session.user_id = null;
   res.redirect('/urls');
 });
 
-app.post('/urls/:shortURL/delete', (req, res) => {
-  const currentUser = req.session.user_id;
-  const urlCreator = urlDatabase[req.params.shortURL].userID;
-  if (currentUser === urlCreator) {
-    const deletingURL = req.params.shortURL;
-    delete urlDatabase[deletingURL];
-    res.redirect('/urls');
-  } else {
-      res.send('This page does not belong to you. So you cannot delete it\n');
-  }
-});
 
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   const currentUser = req.session.user_id;
   const urlCreator = urlDatabase[req.params.shortURL].userID;
   if (currentUser === urlCreator) {
@@ -209,7 +219,22 @@ app.post('/urls/:shortURL', (req, res) => {
       res.send('This page does not belong to you. So you cannot edit it\n');
   }
 });
+/*
 
+All App Delete Requests
+--------------------------------------------------------------------------------
+*/
+app.delete('/urls/:shortURL/delete', (req, res) => {
+  const currentUser = req.session.user_id;
+  const urlCreator = urlDatabase[req.params.shortURL].userID;
+  if (currentUser === urlCreator) {
+    const deletingURL = req.params.shortURL;
+    delete urlDatabase[deletingURL];
+    res.redirect('/urls');
+  } else {
+      res.send('This page does not belong to you. So you cannot delete it\n');
+  }
+});
 /*
 
 Let Server start listening for requests on the Port
