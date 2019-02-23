@@ -24,16 +24,17 @@
   <hr>
   <h5>Number of Unique visits : <%=uniqueTimes%></h5>
   <hr>
-  <table>
+  <h3 style="font-weight: bold; text-decoration: underline;">Time Stamps</h3>
+  <table class='table'>
+    <thead class="thead-dark">
     <tr>
       <th>Date</th>
-      <th>  &nbsp &nbsp &nbsp &nbsp|  &nbsp &nbsp &nbsp &nbsp</th>
       <th>ID of Individual</th>
     </tr>
+  </thead>
   <% for (stamp of timeStamps) { %>
     <tr>
       <td><%= stamp[0]%></td>
-      <td>  &nbsp &nbsp &nbsp &nbsp|  &nbsp &nbsp &nbsp &nbsp </td>
       <td><%= stamp[1]%></td>
     </tr>
     <% } %>
