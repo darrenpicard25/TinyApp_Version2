@@ -19,5 +19,24 @@
   <input class="form-control" type="text" name="newlongURL" value=<%=longURL%> placeholder="http://" style="width: 300px; margin: 1em">
   <button type="submit" class="btn btn-primary">Change URL</button>
   </form>
+  <hr>
+  <h5>Number of times used : <%=timesUsed%></h5>
+  <hr>
+  <h5>Number of Unique visits : <%=uniqueTimes%></h5>
+  <hr>
+  <table>
+    <tr>
+      <th>Date</th>
+      <th>  &nbsp &nbsp &nbsp &nbsp|  &nbsp &nbsp &nbsp &nbsp</th>
+      <th>ID of Individual</th>
+    </tr>
+  <% for (stamp of timeStamps) { %>
+    <tr>
+      <td><%= stamp[0]%></td>
+      <td>  &nbsp &nbsp &nbsp &nbsp|  &nbsp &nbsp &nbsp &nbsp </td>
+      <td><%= stamp[1]%></td>
+    </tr>
+    <% } %>
+
 </body>
 </html>

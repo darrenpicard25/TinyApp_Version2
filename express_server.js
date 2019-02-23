@@ -63,6 +63,34 @@ function urlsForUser (id) {
   }
   return userURLs;
 }
+
+function determineID(req) {
+    let ID;
+  if (req.session.user_id) {
+    ID = req.session.user_id;
+  } else if (req.session.temp_user){
+    ID = req.session.temp_user;
+  } else {
+    ID = generateRandomString();
+    req.session.temp_user = ID;
+  }
+  return ID;
+}
+
+function addUniqueTimeVisited(req, shortURLKey) {
+  let ID = determineID(req);
+  for (let stamps of urlDatabase[shortURLKey].timeStamps) {
+    if (stamps[1] === ID) {
+      return ID;
+    }
+  }
+  urlDatabase[shortURLKey].uniqueTimes += 1;
+  return ID;
+}
+
+function updateTimeStamp(ID, shortURLKey) {
+  urlDatabase[shortURLKey].timeStamps.push([new Date(Date.now()), ID]);
+}
 /*
 
 Both URL and User Databases
@@ -78,7 +106,11 @@ All Unique Requests
 */
 app.get('/u/:shortURL', (req, res) => {
   try {
-    const link = urlDatabase[req.params.shortURL].longURL;
+    let key = req.params.shortURL;
+    const link = urlDatabase[key].longURL;
+    urlDatabase[key].timesUsed += 1;
+    let ID = addUniqueTimeVisited(req, key);
+    updateTimeStamp(ID, key);
     res.redirect(link);
   }
   catch (error) {
@@ -145,7 +177,10 @@ app.get('/urls/:shortURL', (req, res) => {
     const templateData = {
       shortURL: req.params.shortURL,
       longURL: urlDatabase[req.params.shortURL].longURL,
-      username: usersDatabase[req.session.user_id]
+      username: usersDatabase[req.session.user_id],
+      timesUsed: urlDatabase[req.params.shortURL].timesUsed,
+      uniqueTimes: urlDatabase[req.params.shortURL].uniqueTimes,
+      timeStamps: urlDatabase[req.params.shortURL].timeStamps
     };
     res.render('urls_show', templateData);
   } else {
@@ -161,7 +196,13 @@ app.post('/urls', (req, res) => {
   const newURL = req.body.longURL;
   const userID = req.session.user_id;
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {longURL: newURL, userID: userID};
+  urlDatabase[shortURL] = {
+    longURL: newURL,
+    userID: userID,
+    timesUsed: 0,
+    uniqueTimes: 0,
+    timeStamps: []
+   };
   res.redirect(`/urls`);
 });
 /*
